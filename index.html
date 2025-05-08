@@ -267,8 +267,7 @@
       
       iconItems.forEach(item => {
         const iconName = item.getAttribute('data-name').toLowerCase();
-        const iconCode = item.getAttribute('data-code').toLowerCase();
-        if (iconName.includes(searchTerm) || iconCode.includes(searchTerm)) {
+        if (iconName.includes(searchTerm)) {
           item.style.display = 'flex';
         } else {
           item.style.display = 'none';
@@ -380,7 +379,7 @@
         // Create icon name - hiển thị đầy đủ tên class
         const iconName = document.createElement('div');
         iconName.className = 'icon-name';
-        iconName.textContent = icon.code;
+        iconName.textContent = icon.name;
         
         // Add to item
         iconItem.appendChild(iconDisplay);
