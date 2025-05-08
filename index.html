@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trình xem biểu tượng</title>
+  <!-- Import CSS từ các bộ icon -->
+  <link rel="stylesheet" href="./iconsax/style.css">
+  <link rel="stylesheet" href="./infogram/css/style.css">
+  <link rel="stylesheet" href="./ui-icon/css/style.css">
+  <style>
+    :root {
+      --main-color: #CE7A58;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    .container {
+      max-width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Tab navigation */
+    .tab-nav {
+      display: flex;
+      background-color: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .tab-btn {
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #595959;
+      position: relative;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    
+    .tab-btn.active {
+      color: var(--main-color);
+    }
+    
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--main-color);
+    }
+    
+    .tab-btn:hover {
+      color: var(--main-color);
+    }
+    
+    /* Search box */
+    .search-container {
+      padding: 16px;
+      background-color: #fff;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .search-box:focus {
+      border-color: var(--main-color);
+      /* box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); */
+      outline: none;
+    }
+    
+    /* Tab content */
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      height: calc(100vh - 113px); /* Viewport height - tab height - search height */
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Icons grid */
+    .icons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+    
+    .icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 8px;
+      background-color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      height: 120px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .icon-item:hover {
+      background-color: #e6f7ff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+      transform: translateY(-2px);
+    }
+    
+    .icon-display {
+      font-size: 28px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+    
+    .icon-name {
+      font-size: 12px;
+      color: #666;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      white-space: nowrap;
+      user-select: none;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+    
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--main-color);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Tab navigation -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="iconsax">Iconsax</button>
+      <button class="tab-btn" data-tab="infogram">Infogram</button>
+      <button class="tab-btn" data-tab="ui-icon">UI Icon</button>
+    </div>
+    
+    <!-- Search box -->
+    <div class="search-container">
+      <input type="text" class="search-box" id="searchBox" placeholder="Tìm kiếm biểu tượng...">
+    </div>
+    
+    <!-- Tab content -->
+    <div class="tab-content active" id="iconsax-tab">
+      <div class="loading" id="iconsax-loading">
+        <div class="spinner"></div>
+        <span>Đang tải...</span>
+      </div>
+      <div class="icons-grid" id="iconsax-grid"></div>
+    </div>
+    
+    <div class="tab-content" id="infogram-tab">
+      <div class="loading" id="infogram-loading">
+        <div class="spinner"></div>
+        <span>Đang tải...</span>
+      </div>
+      <div class="icons-grid" id="infogram-grid"></div>
+    </div>
+    
+    <div class="tab-content" id="ui-icon-tab">
+      <div class="loading" id="ui-icon-loading">
+        <div class="spinner"></div>
+        <span>Đang tải...</span>
+      </div>
+      <div class="icons-grid" id="ui-icon-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to current tab
+        btn.classList.add('active');
+        const tabId = btn.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+        
+        // Load icons if not already loaded
+        loadTabIcons(tabId);
+      });
+    });
+    
+    // Search functionality
+    const searchBox = document.getElementById('searchBox');
+    searchBox.addEventListener('input', filterIcons);
+    
+    function filterIcons() {
+      const searchTerm = searchBox.value.toLowerCase();
+      const activeTab = document.querySelector('.tab-content.active');
+      const iconItems = activeTab.querySelectorAll('.icon-item');
+      
+      iconItems.forEach(item => {
+        const iconName = item.getAttribute('data-name').toLowerCase();
+        const iconCode = item.getAttribute('data-code').toLowerCase();
+        if (iconName.includes(searchTerm) || iconCode.includes(searchTerm)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    // Icon data cache
+    const iconData = {
+      iconsax: [],
+      infogram: [],
+      'ui-icon': []
+    };
+    
+    // Load status
+    const loadStatus = {
+      iconsax: false,
+      infogram: false,
+      'ui-icon': false
+    };
+    
+    // Parse CSS for icons
+    async function parseIconsFromCSS(url, prefix, tabId) {
+      try {
+        const response = await fetch(url);
+        const cssText = await response.text();
+        
+        // Extract icon names using regex
+        const iconRegex = new RegExp(`\\.${prefix}-([^:]+):before\\s*{\\s*content:\\s*"\\\\([^"]+)"`, 'g');
+        let match;
+        const icons = [];
+        
+        while ((match = iconRegex.exec(cssText)) !== null) {
+          icons.push({
+            name: match[1],
+            code: `${prefix}-${match[1]}`
+          });
+        }
+        
+        return icons;
+      } catch (error) {
+        console.error(`Error loading ${tabId} icons:`, error);
+        document.getElementById(`${tabId}-loading`).innerHTML = `<div>Lỗi khi tải biểu tượng: ${error.message}</div>`;
+        return [];
+      }
+    }
+    
+    // Load icons for a specific tab
+    async function loadTabIcons(tabId) {
+      if (loadStatus[tabId]) return; // Already loaded
+      
+      const loadingEl = document.getElementById(`${tabId}-loading`);
+      const gridEl = document.getElementById(`${tabId}-grid`);
+      
+      try {
+        let icons = [];
+        
+        if (iconData[tabId].length === 0) {
+          switch(tabId) {
+            case 'iconsax':
+              icons = await parseIconsFromCSS('./iconsax/style.css', 'isax', tabId);
+              break;
+            case 'infogram':
+              icons = await parseIconsFromCSS('./infogram/css/style.css', 'infogram', tabId);
+              break;
+            case 'ui-icon':
+              icons = await parseIconsFromCSS('./ui-icon/css/style.css', 'uii', tabId);
+              break;
+          }
+          
+          iconData[tabId] = icons;
+        } else {
+          icons = iconData[tabId];
+        }
+        
+        // Render icons
+        renderIcons(icons, tabId);
+        
+        // Hide loading
+        loadingEl.style.display = 'none';
+        loadStatus[tabId] = true;
+      } catch (error) {
+        console.error(`Error in loadTabIcons for ${tabId}:`, error);
+        loadingEl.innerHTML = `<div>Lỗi khi tải biểu tượng: ${error.message}</div>`;
+      }
+    }
+    
+    // Render icons to grid
+    function renderIcons(icons, tabId) {
+      const gridEl = document.getElementById(`${tabId}-grid`);
+      gridEl.innerHTML = '';
+      
+      // Sort icons by name
+      icons.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Hiển thị tất cả các biểu tượng thay vì chỉ giới hạn 500
+      const visibleIcons = icons;
+      
+      visibleIcons.forEach(icon => {
+        const iconItem = document.createElement('div');
+        iconItem.className = 'icon-item';
+        iconItem.setAttribute('data-name', icon.name);
+        iconItem.setAttribute('data-code', icon.code);
+        
+        // Create icon display
+        const iconDisplay = document.createElement('i');
+        iconDisplay.className = `icon-display ${icon.code}`;
+        
+        // Create icon name - hiển thị đầy đủ tên class
+        const iconName = document.createElement('div');
+        iconName.className = 'icon-name';
+        iconName.textContent = icon.code;
+        
+        // Add to item
+        iconItem.appendChild(iconDisplay);
+        iconItem.appendChild(iconName);
+        
+        // Add click handler
+        iconItem.addEventListener('click', () => {
+          // Send message to parent window
+          window.parent.postMessage({
+            type: 'ICON_SELECTED',
+            iconCode: icon.code
+          }, '*');
+        });
+        
+        gridEl.appendChild(iconItem);
+      });
+    }
+    
+    // Load initial tab (iconsax)
+    loadTabIcons('iconsax');
+  </script>
+</body>
+</html> 
