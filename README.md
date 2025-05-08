@@ -26,4 +26,6 @@ Một ứng dụng đơn giản để xem và tìm kiếm biểu tượng từ c
     window.addEventListener('message', this.messageListener);
     ```
 6. Dùng tại giao diện 
+    ```typescript
     <i class="{iconCode}"></i>
+    ````
